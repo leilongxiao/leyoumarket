@@ -1,0 +1,18 @@
+server:
+  port: 8081
+spring:
+  application:
+    name: item-service
+  datasource:
+    url: jdbc:mysql:///leyoumall
+    username: root
+    password: 123456
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka
+  instance:
+    lease-renewal-interval-in-seconds: 5 #心跳时间
+    lease-expiration-duration-in-seconds: 15 #过期时间
+mybatis:
+  type-aliases-package: com.leyou.item.pojo  #扫描interface中的包路径

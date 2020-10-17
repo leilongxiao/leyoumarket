@@ -1,0 +1,16 @@
+server:
+  port: 10010
+spring:
+  application:
+    name: leyou-gateway
+eureka:
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:10086/eureka
+    registry-fetch-interval-seconds: 10
+
+zuul:
+  prefix: /api
+  #route路由
+  routes:
+    item-service: /item/** #添加商品微服务的路由、伟服务都要通过网管来进行访问
