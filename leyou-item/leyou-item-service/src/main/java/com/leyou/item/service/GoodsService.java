@@ -5,7 +5,9 @@ import com.github.pagehelper.PageInfo;
 import com.leyou.common.pojo.PageResult;
 import com.leyou.item.bo.SpuBo;
 import com.leyou.item.mapper.BrandMapper;
+import com.leyou.item.mapper.CategoryBrandMapper;
 import com.leyou.item.mapper.SpuMapper;
+import com.leyou.item.pojo.Brand;
 import com.leyou.item.pojo.Spu;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -28,6 +30,9 @@ public class GoodsService {
 
     @Autowired
     private BrandMapper brandMapper;
+
+    @Autowired
+    private CategoryBrandMapper categoryBrandMapper;
 
     public PageResult<SpuBo> querySpuBoByPage(String key, Boolean saleable, Integer page, Integer rows) {
 
@@ -65,5 +70,9 @@ public class GoodsService {
 
         return new PageResult<>(pageInfo.getTotal(), spuBos);
 
+    }
+
+    public List<Brand> queryBrandByCategoryID(Integer cid) {
+        return categoryBrandMapper.queryBrandByCategoryID(cid);
     }
 }
