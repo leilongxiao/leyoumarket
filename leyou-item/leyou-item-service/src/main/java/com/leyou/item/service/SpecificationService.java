@@ -29,4 +29,10 @@ public class SpecificationService {
         record.setCid(cid);
         return this.specGroupMapper.select(record);
     }
+
+    public List<SpecParam> queryParamsByGid(Long gid) {
+        SpecParam record = new SpecParam();
+        record.setGroupId(gid);
+        return this.specParamMapper.select(record);
+    }
 }
