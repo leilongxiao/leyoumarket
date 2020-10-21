@@ -30,6 +30,11 @@ public class SpecificationService {
         return this.specGroupMapper.select(record);
     }
 
+    /**
+     * 根据品牌id查询规格参数值
+     * @param gid
+     * @return
+     */
     public List<SpecParam> queryParamsByGid(Long gid) {
         SpecParam record = new SpecParam();
         record.setGroupId(gid);

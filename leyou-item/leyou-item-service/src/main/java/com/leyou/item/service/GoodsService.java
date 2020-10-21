@@ -4,11 +4,11 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.leyou.common.pojo.PageResult;
 import com.leyou.item.bo.SpuBo;
-import com.leyou.item.mapper.BrandMapper;
-import com.leyou.item.mapper.CategoryBrandMapper;
-import com.leyou.item.mapper.SpuMapper;
+import com.leyou.item.mapper.*;
 import com.leyou.item.pojo.Brand;
+import com.leyou.item.pojo.SpecParam;
 import com.leyou.item.pojo.Spu;
+import com.leyou.item.pojo.SpuDetail;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,17 @@ public class GoodsService {
     @Autowired
     private CategoryBrandMapper categoryBrandMapper;
 
+    @Autowired
+    private SpecParamMapper specParamMapper;
+
+    /**
+     * goods页根据分页查询Spu
+     * @param key
+     * @param saleable
+     * @param page
+     * @param rows
+     * @return
+     */
     public PageResult<SpuBo> querySpuBoByPage(String key, Boolean saleable, Integer page, Integer rows) {
 
         Example example = new Example(Spu.class);
@@ -41,7 +52,7 @@ public class GoodsService {
         Example.Criteria criteria = example.createCriteria();
         // 1.搜索条件,类似
         //select * from tb_spu where title likes "%key%" and saleable={#saleable}
-        if (StringUtils.isNotBlank(key)&&saleable != null) {
+        if (StringUtils.isNotBlank(key) && saleable != null) {
             criteria.andLike("title", "%" + key + "%").andEqualTo("saleable", saleable);
         }
 
@@ -54,7 +65,7 @@ public class GoodsService {
         PageInfo<Spu> pageInfo = new PageInfo<>(spus);//最重要2行a
 
         List<SpuBo> spuBos = new ArrayList<>();
-        spus.forEach(spu->{
+        spus.forEach(spu -> {
             SpuBo spuBo = new SpuBo();
             // copy共同属性的值到新的对象
             BeanUtils.copyProperties(spu, spuBo);
@@ -72,7 +83,23 @@ public class GoodsService {
 
     }
 
-    public List<Brand> queryBrandByCategoryID(Integer cid) {
+    /**
+     * 根据前端输入（这个前端输入是后端选择了分类之后之后给出的一个cid值）查询品牌
+     * @param cid
+     * @return
+     */
+    public List<Brand> queryBrandByCategoryID(Long cid) {
         return categoryBrandMapper.queryBrandByCategoryID(cid);
+    }
+
+    /**
+     * 根据cid查询规格参数
+     * @param cid
+     * @return
+     */
+    public List<SpecParam> querySpecParamsByCid(Long cid) {
+        SpecParam specParam = new SpecParam();
+        specParam.setCid(cid);
+        return this.specParamMapper.select(specParam);
     }
 }

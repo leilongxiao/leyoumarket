@@ -15,5 +15,5 @@ public interface CategoryBrandMapper extends Mapper<CategoryBrand> {
             "left join tb_brand tb\n" +
             "on tcb.brand_id=tb.id\n" +
             "where category_id=#{cid}")
-    List<Brand> queryBrandByCategoryID(Integer cid);
+    List<Brand> queryBrandByCategoryID(Long cid);
 }

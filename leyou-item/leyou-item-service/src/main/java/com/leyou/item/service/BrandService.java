@@ -18,7 +18,15 @@ public class BrandService {
     @Autowired
     private BrandMapper brandMapper;
 
-
+    /**
+     * 根据前端输入查询品牌分页列表
+     * @param key
+     * @param page
+     * @param rows
+     * @param sortBy
+     * @param desc
+     * @return
+     */
     public PageResult<Brand> queryBrandsByPage(String key, Integer page, Integer rows, String sortBy, Boolean desc) {
         //初始化一个example对象
         Example example = new Example(Brand.class);

@@ -26,6 +26,11 @@ public class CategoryService {
         return this.categoryMapper.select(record);
     }
 
+    /**
+     * 根据id列表查询分类名称列表
+     * @param ids
+     * @return
+     */
     public List<String> queryNamesByIds(List<Long> ids) {
         List<Category> list = this.categoryMapper.selectByIdList(ids);
         List<String> names = new ArrayList<>();
