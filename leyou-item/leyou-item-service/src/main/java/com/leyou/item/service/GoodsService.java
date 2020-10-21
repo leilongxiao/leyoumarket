@@ -35,7 +35,7 @@ public class GoodsService {
     private CategoryBrandMapper categoryBrandMapper;
 
     @Autowired
-    private SpecificationService specificationService;
+    private SpecParamMapper specParamMapper;
 
     /**
      * goods页根据分页查询Spu
@@ -92,23 +92,14 @@ public class GoodsService {
         return categoryBrandMapper.queryBrandByCategoryID(cid);
     }
 
-//    /**
-//     * 根据cid查询规格参数
-//     * @param cid
-//     * @return
-//     */
-//    public List<SpecParam> querySpecParamsByCid(Long cid) {
-//        SpecParam specParam = new SpecParam();
-//        specParam.setCid(cid);
-//        return this.specParamMapper.select(specParam);
-//    }
-
     /**
      * 根据cid查询规格参数
      * @param cid
      * @return
      */
     public List<SpecParam> querySpecParamsByCid(Long cid) {
-        return this.specificationService.queryParamsByGid(null,cid,null,null);
+        SpecParam specParam = new SpecParam();
+        specParam.setCid(cid);
+        return this.specParamMapper.select(specParam);
     }
 }
