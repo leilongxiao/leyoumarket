@@ -1,18 +1,18 @@
 package com.leyou.item.controller;
 
 import com.leyou.common.pojo.PageResult;
+import com.leyou.common.utils.ObjectUtils;
 import com.leyou.item.bo.SpuBo;
+import com.leyou.item.pojo.Sku;
 import com.leyou.item.pojo.SpecParam;
+import com.leyou.item.pojo.SpuDetail;
 import com.leyou.item.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -58,4 +58,29 @@ public class GoodsController {
         this.goodsService.saveGoods(spuBo);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    /**
+     * 编辑SpuDetail（获取spuDetail）
+     * @param spuId
+     * @return
+     */
+    @GetMapping("spu/detail/{spuId}")
+    public ResponseEntity<SpuDetail> editGoodsDetail(@PathVariable("spuId") Long spuId){
+        SpuDetail spuDetail = goodsService.querySpuDetailBySpuId(spuId);
+        if (ObjectUtils.allFieldIsNULL(spuDetail)){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(spuDetail);
+    }
+
+    @GetMapping("sku/list")
+    public ResponseEntity<List<Sku>> editGoodsSku(@RequestParam("id") Long spuId){
+        List<Sku> skus = goodsService.querySkuBySpuId(spuId);
+        if (CollectionUtils.isEmpty(skus)){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(skus);
+    }
+
+
 }

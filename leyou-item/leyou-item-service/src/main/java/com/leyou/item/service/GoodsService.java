@@ -140,4 +140,22 @@ public class GoodsService {
         });
         //this.skuMapper.insertList(skus);
     }
+
+    public SpuDetail querySpuDetailBySpuId(Long spuId){
+        return this.spuDetailMapper.selectByPrimaryKey(spuId);
+    }
+
+    public List<Sku> querySkuBySpuId(Long spuId){
+        Sku sku = new Sku();
+        sku.setSpuId(spuId);
+        List<Sku> skus = this.skuMapper.select(sku);
+        //给skus加上 库存（没考虑到的），应该表和对象连起来看
+        skus.forEach(s -> {
+            Stock stock = this.stockMapper.selectByPrimaryKey(s.getId());
+            s.setStock(stock.getStock());
+        });
+        return skus;
+    }
+
+
 }
