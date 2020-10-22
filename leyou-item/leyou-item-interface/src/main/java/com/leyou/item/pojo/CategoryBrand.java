@@ -7,7 +7,7 @@ import javax.persistence.Table;
  *
  * @author 自动生成 2020-10-20
  */
-@Table(name="tb_category_brand")
+@Table(name = "tb_category_brand")
 public class CategoryBrand {
 
     /**

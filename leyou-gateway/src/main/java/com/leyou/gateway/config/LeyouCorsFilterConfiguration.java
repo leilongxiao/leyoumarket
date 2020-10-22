@@ -9,7 +9,7 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class LeyouCorsFilterConfiguration {
     @Bean
-    public CorsFilter corsFilter(){
+    public CorsFilter corsFilter() {
         //初始化配置对象
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         //允许跨越的域名，可以设置多个，*代表所有域名，如果要带cookie，一定要设置为*
@@ -20,7 +20,7 @@ public class LeyouCorsFilterConfiguration {
         //初始化配置源对象
         UrlBasedCorsConfigurationSource configurationSource = new UrlBasedCorsConfigurationSource();
         //拦截所有请求，校验是否允许跨域
-        configurationSource.registerCorsConfiguration("/**",corsConfiguration);
+        configurationSource.registerCorsConfiguration("/**", corsConfiguration);
         return new CorsFilter(configurationSource);
     }
 }

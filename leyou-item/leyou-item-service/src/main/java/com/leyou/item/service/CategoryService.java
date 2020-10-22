@@ -13,6 +13,7 @@ public class CategoryService {
 
     @Autowired
     private CategoryMapper categoryMapper;
+
     /**
      * 根据父id查询子类目
      *
@@ -28,6 +29,7 @@ public class CategoryService {
 
     /**
      * 根据id列表查询分类名称列表
+     *
      * @param ids
      * @return
      */

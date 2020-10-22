@@ -10,6 +10,6 @@ import tk.mybatis.spring.annotation.MapperScan;
 @MapperScan("com.leyou.item.mapper")
 public class LeyouItemApplication {
     public static void main(String[] args) {
-        SpringApplication.run(LeyouItemApplication.class,args);
+        SpringApplication.run(LeyouItemApplication.class, args);
     }
 }

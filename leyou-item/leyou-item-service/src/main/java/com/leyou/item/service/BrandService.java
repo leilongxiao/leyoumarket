@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.leyou.common.pojo.PageResult;
 import com.leyou.item.mapper.BrandMapper;
+import com.leyou.item.mapper.CategoryBrandMapper;
 import com.leyou.item.pojo.Brand;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,12 @@ public class BrandService {
     @Autowired
     private BrandMapper brandMapper;
 
+    @Autowired
+    private CategoryBrandMapper categoryBrandMapper;
+
     /**
      * 根据前端输入查询品牌分页列表
+     *
      * @param key
      * @param page
      * @param rows
@@ -51,6 +56,7 @@ public class BrandService {
 
     /**
      * 新增品牌
+     *
      * @param brand
      * @param cids
      */
@@ -59,7 +65,20 @@ public class BrandService {
         //新增品牌,cids是分类id，下面的id是品牌id
         //只能同时成功
         this.brandMapper.insertSelective(brand);
-        cids.forEach(cid->{ this.brandMapper.saveCategoryAndBrand(cid,brand.getId());});
+        cids.forEach(cid -> {
+            this.brandMapper.saveCategoryAndBrand(cid, brand.getId());
+        });
 
     }
+
+    /**
+     * 根据前端输入（这个前端输入是后端选择了分类之后之后给出的一个cid值）查询品牌
+     *
+     * @param cid
+     * @return
+     */
+    public List<Brand> queryBrandsByCid(Long cid) {
+        return categoryBrandMapper.queryBrandByCategoryID(cid);
+    }
+
 }
