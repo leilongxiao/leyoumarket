@@ -8,10 +8,11 @@ import java.util.Date;
 
 /**
  * spu表,该表描述的是一个抽象性的商品,比如 iphone8
+ *
  * @author 自动生成 2020-10-20
  */
 
-@Table(name="tb_spu")
+@Table(name = "tb_spu")
 public class Spu {
 
     /**
@@ -163,4 +164,6 @@ public class Spu {
     public void setLastUpdateTime(Date lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
     }
+
+
 }

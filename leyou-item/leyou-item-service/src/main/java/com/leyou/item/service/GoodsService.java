@@ -5,18 +5,17 @@ import com.github.pagehelper.PageInfo;
 import com.leyou.common.pojo.PageResult;
 import com.leyou.item.bo.SpuBo;
 import com.leyou.item.mapper.*;
-import com.leyou.item.pojo.Brand;
-import com.leyou.item.pojo.SpecParam;
-import com.leyou.item.pojo.Spu;
-import com.leyou.item.pojo.SpuDetail;
+import com.leyou.item.pojo.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -32,13 +31,20 @@ public class GoodsService {
     private BrandMapper brandMapper;
 
     @Autowired
-    private CategoryBrandMapper categoryBrandMapper;
+    private SpecParamMapper specParamMapper;
 
     @Autowired
-    private SpecParamMapper specParamMapper;
+    private SpuDetailMapper spuDetailMapper;
+
+    @Autowired
+    private SkuMapper skuMapper;
+
+    @Autowired
+    private StockMapper stockMapper;
 
     /**
      * goods页根据分页查询Spu
+     *
      * @param key
      * @param saleable
      * @param page
@@ -83,17 +89,10 @@ public class GoodsService {
 
     }
 
-    /**
-     * 根据前端输入（这个前端输入是后端选择了分类之后之后给出的一个cid值）查询品牌
-     * @param cid
-     * @return
-     */
-    public List<Brand> queryBrandByCategoryID(Long cid) {
-        return categoryBrandMapper.queryBrandByCategoryID(cid);
-    }
 
     /**
      * 根据cid查询规格参数
+     *
      * @param cid
      * @return
      */
@@ -101,5 +100,44 @@ public class GoodsService {
         SpecParam specParam = new SpecParam();
         specParam.setCid(cid);
         return this.specParamMapper.select(specParam);
+    }
+
+
+    /**
+     * 新增商品
+     *
+     * @param spuBo
+     */
+    @Transactional
+    public void saveGoods(SpuBo spuBo) {
+        // 新增spu
+        // 设置默认字段
+//      spuBo.setId(null);
+        spuBo.setSaleable(true);
+        spuBo.setValid(true);
+        spuBo.setCreateTime(new Date());
+        spuBo.setLastUpdateTime(spuBo.getCreateTime());
+        this.spuMapper.insertSelective(spuBo);
+
+        // 新增spuDetail
+        SpuDetail spuDetail = spuBo.getSpuDetail();
+        spuDetail.setSpuId(spuBo.getId());
+        this.spuDetailMapper.insertSelective(spuDetail);
+
+        List<Sku> skus = spuBo.getSkus();
+        skus.forEach(sku -> {
+            //新增sku
+            sku.setId(null);
+            sku.setSpuId(spuBo.getId());
+            sku.setCreateTime(new Date());
+            sku.setLastUpdateTime(sku.getCreateTime());
+            this.skuMapper.insertSelective(sku);
+            //新增stock
+            Stock stock = new Stock();
+            stock.setSkuId(sku.getId());
+            stock.setStock(sku.getStock());
+            this.stockMapper.insertSelective(stock);
+        });
+        //this.skuMapper.insertList(skus);
     }
 }

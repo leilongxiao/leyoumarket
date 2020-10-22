@@ -7,7 +7,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
- *  tb_spu_detail
+ * tb_spu_detail
+ *
  * @author 自动生成 2020-10-20
  */
 @Table(name = "tb_spu_detail")
@@ -44,7 +45,6 @@ public class SpuDetail {
      * 售后服务
      */
     private String afterService;
-
 
 
     //getter/setter方法
