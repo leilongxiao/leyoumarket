@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
@@ -124,28 +125,36 @@ public class GoodsService {
         spuDetail.setSpuId(spuBo.getId());
         this.spuDetailMapper.insertSelective(spuDetail);
 
+//        List<Sku> skus = spuBo.getSkus();
+//        skus.forEach(sku -> sku.setCreateTime(new Date()));
+        addSkusAndStock(spuBo);
+        //this.skuMapper.insertList(skus);
+    }
+
+    //增加skus-stock的方法，这个方法只是被别的方法调用，本身不直接被controller调用
+    public void addSkusAndStock(SpuBo spuBo) {
         List<Sku> skus = spuBo.getSkus();
         skus.forEach(sku -> {
             //新增sku
             sku.setId(null);
+            //在SpuBo方法中为id
             sku.setSpuId(spuBo.getId());
             sku.setCreateTime(new Date());
             sku.setLastUpdateTime(sku.getCreateTime());
             this.skuMapper.insertSelective(sku);
-            //新增stock
+            //新增stock,先设置属性名称不对应的属性，然后插入数据库
             Stock stock = new Stock();
             stock.setSkuId(sku.getId());
             stock.setStock(sku.getStock());
             this.stockMapper.insertSelective(stock);
         });
-        //this.skuMapper.insertList(skus);
     }
 
-    public SpuDetail querySpuDetailBySpuId(Long spuId){
+    public SpuDetail querySpuDetailBySpuId(Long spuId) {
         return this.spuDetailMapper.selectByPrimaryKey(spuId);
     }
 
-    public List<Sku> querySkuBySpuId(Long spuId){
+    public List<Sku> querySkusBySpuId(Long spuId) {
         Sku sku = new Sku();
         sku.setSpuId(spuId);
         List<Sku> skus = this.skuMapper.select(sku);
@@ -157,5 +166,35 @@ public class GoodsService {
         return skus;
     }
 
+    /**
+     * 更新货物
+     *
+     * @param spuBo
+     */
+    @Transactional
+    public void updateGoods(SpuBo spuBo) {
+        //1.获取旧数据对象（数据库中的spu和spuDetail,sku和stock）
+        //2.设置新数据
+        //3.保存更新update
 
+        //多个sku-stock是特色，条数可能变化，需要先删除后添加
+        List<Sku> skus = this.querySkusBySpuId(spuBo.getId());
+        if (!CollectionUtils.isEmpty(skus)) {
+            skus.forEach(sku -> {
+                this.skuMapper.delete(sku);
+                this.stockMapper.deleteByPrimaryKey(sku.getId());
+            });
+        }
+        //添加sku-stock
+        this.addSkusAndStock(spuBo);
+
+        spuBo.setLastUpdateTime(new Date());
+        spuBo.setCreateTime(null);
+        spuBo.setValid(true);//因为是有效的
+        spuBo.setSaleable(true);
+
+        //spu和spuDetail更新即可
+        this.spuMapper.updateByPrimaryKeySelective(spuBo);//
+        this.spuDetailMapper.updateByPrimaryKeySelective(spuBo.getSpuDetail());
+    }
 }

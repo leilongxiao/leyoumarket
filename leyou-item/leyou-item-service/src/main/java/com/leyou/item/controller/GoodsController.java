@@ -75,11 +75,18 @@ public class GoodsController {
 
     @GetMapping("sku/list")
     public ResponseEntity<List<Sku>> editGoodsSku(@RequestParam("id") Long spuId){
-        List<Sku> skus = goodsService.querySkuBySpuId(spuId);
+        List<Sku> skus = goodsService.querySkusBySpuId(spuId);
         if (CollectionUtils.isEmpty(skus)){
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(skus);
+    }
+
+    //更新商品
+    @PutMapping("goods")
+    public ResponseEntity<Void> updateGoods(@RequestBody SpuBo spuBo){
+        this.goodsService.updateGoods(spuBo);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 
