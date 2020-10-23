@@ -4,6 +4,7 @@ import com.leyou.item.mapper.CategoryMapper;
 import com.leyou.item.pojo.Category;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.ls.LSOutput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,9 @@ public class CategoryService {
         for (Category category : list) {
             names.add(category.getName());
         }
+        System.out.print("sfas");
         return names;
         // return list.stream().map(category -> category.getName()).collect(Collectors.toList());
     }
+
 }
