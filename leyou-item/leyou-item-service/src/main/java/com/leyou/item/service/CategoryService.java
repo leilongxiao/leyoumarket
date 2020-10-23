@@ -41,6 +41,8 @@ public class CategoryService {
             names.add(category.getName());
         }
         System.out.print("sfas");
+        System.out.print("sfas");
+
         return names;
         // return list.stream().map(category -> category.getName()).collect(Collectors.toList());
     }
