@@ -89,5 +89,10 @@ public class GoodsController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-
+    //删除商品
+    @GetMapping("spu/delete")
+    public ResponseEntity<Void> deleteGood(@RequestParam("spuId") Long spuId){
+        this.goodsService.deleteGood(spuId);
+        return ResponseEntity.ok().build();
+    }
 }

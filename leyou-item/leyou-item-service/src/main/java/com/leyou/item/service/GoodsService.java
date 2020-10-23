@@ -53,7 +53,6 @@ public class GoodsService {
      * @return
      */
     public PageResult<SpuBo> querySpuBoByPage(String key, Boolean saleable, Integer page, Integer rows) {
-
         Example example = new Example(Spu.class);
         //criteria标准，准则，原则
         Example.Criteria criteria = example.createCriteria();
@@ -62,7 +61,6 @@ public class GoodsService {
         if (StringUtils.isNotBlank(key) && saleable != null) {
             criteria.andLike("title", "%" + key + "%").andEqualTo("saleable", saleable);
         }
-
 
         // 2.分页条件
         PageHelper.startPage(page, rows);//最b
@@ -178,23 +176,44 @@ public class GoodsService {
         //3.保存更新update
 
         //多个sku-stock是特色，条数可能变化，需要先删除后添加
-        List<Sku> skus = this.querySkusBySpuId(spuBo.getId());
+        this.deleteSkusAndStock(spuBo.getId());
+        //添加sku-stock
+        this.addSkusAndStock(spuBo);
+
+        spuBo.setLastUpdateTime(new Date());
+        spuBo.setCreateTime(null);
+        spuBo.setValid(true);//因为可以看到等，就是为true的，不能改完之后就看不到了这样子
+        spuBo.setSaleable(true);
+
+        //spu和spuDetail更新即可
+        this.spuMapper.updateByPrimaryKeySelective(spuBo);//
+        this.spuDetailMapper.updateByPrimaryKeySelective(spuBo.getSpuDetail());
+
+    }
+
+    /**
+     * 删除sku-stock
+     */
+    public void deleteSkusAndStock(Long spuId) {
+        List<Sku> skus = this.querySkusBySpuId(spuId);
         if (!CollectionUtils.isEmpty(skus)) {
             skus.forEach(sku -> {
                 this.skuMapper.delete(sku);
                 this.stockMapper.deleteByPrimaryKey(sku.getId());
             });
         }
-        //添加sku-stock
-        this.addSkusAndStock(spuBo);
+    }
 
-        spuBo.setLastUpdateTime(new Date());
-        spuBo.setCreateTime(null);
-        spuBo.setValid(true);//因为是有效的
-        spuBo.setSaleable(true);
-
-        //spu和spuDetail更新即可
-        this.spuMapper.updateByPrimaryKeySelective(spuBo);//
-        this.spuDetailMapper.updateByPrimaryKeySelective(spuBo.getSpuDetail());
+    /**
+     * 必须只能删除sku表
+     *
+     * @param spuId
+     */
+    public void deleteGood(Long spuId) {
+        //根据spuId伤处skus和stock
+        this.deleteSkusAndStock(spuId);
+        //删除spu表和spuDetail中对应的spuId行
+        this.spuDetailMapper.deleteByPrimaryKey(spuId);
+        this.spuMapper.deleteByPrimaryKey(spuId);
     }
 }
