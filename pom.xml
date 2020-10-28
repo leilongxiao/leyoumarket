@@ -14,8 +14,9 @@
         <module>leyou-common</module>
         <module>leyou-upload</module>
         <module>leyou-user</module>
-        <module>../leyou-user</module>
+<!--        <module>../leyou-user</module>-->
         <module>leyou-user</module>
+        <module>leyou-sms-service</module>
     </modules>
     <dependencies>
         <dependency>
@@ -91,6 +92,11 @@
                 <groupId>com.github.tobato</groupId>
                 <artifactId>fastdfs-client</artifactId>
                 <version>${fastDFS.client.version}</version>
+            </dependency>
+            <!-- 配置使用redis启动器 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-redis</artifactId>
             </dependency>
         </dependencies>
     </dependencyManagement>
