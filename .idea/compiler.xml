@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="leyou-registry" />
         <module name="leyou-sms-service" />
+        <module name="leyou-search" />
         <module name="leyou-user-interface" />
         <module name="leyou-item-interface" />
         <module name="leyou-user-service" />
@@ -28,6 +29,7 @@
       <module name="leyou-item-interface" options="-parameters" />
       <module name="leyou-item-service" options="-parameters" />
       <module name="leyou-registry" options="-parameters" />
+      <module name="leyou-search" options="-parameters" />
       <module name="leyou-sms-service" options="-parameters" />
       <module name="leyou-upload" options="-parameters" />
       <module name="leyou-user" options="-parameters" />
