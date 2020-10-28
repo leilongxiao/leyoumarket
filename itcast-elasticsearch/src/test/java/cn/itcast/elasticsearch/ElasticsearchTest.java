@@ -91,6 +91,7 @@ public class ElasticsearchTest {
 
     /**
      * 这里可以有很多种高级查询，如模糊查询、匹配查询等
+     *ItemRepository类有关
      */
     @Test
     public void testMatch() {
@@ -101,6 +102,7 @@ public class ElasticsearchTest {
 
     /**
      * 重点  为自定义查询
+     * NativeSearchQueryBuilder自定义查询的工厂
      * QueryBuilders工具类
      * SortBuilders工具类
      */
@@ -150,6 +152,9 @@ public class ElasticsearchTest {
         });
     }
 
+    /**
+     * 聚合查询的子查询，这个需要去了解下什么是聚合查询
+     */
     @Test
     public void testSubAgg() {
         //构建自定义查询工厂
@@ -172,7 +177,7 @@ public class ElasticsearchTest {
             //解析子聚合,子聚合结果集转成map结构，key-聚合名称，value-聚合对象
             //Map<price_avg,aggregation>
             Map<String, Aggregation> stringAggregationMap = bucket.getAggregations().asMap();
-            InternalAvg price_avg = (InternalAvg)stringAggregationMap.get("price_avg");
+            InternalAvg price_avg = (InternalAvg) stringAggregationMap.get("price_avg");
             System.out.println(price_avg.getValue());
         });
     }

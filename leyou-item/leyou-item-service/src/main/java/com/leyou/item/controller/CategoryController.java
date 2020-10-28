@@ -7,9 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -48,5 +46,38 @@ public class CategoryController {
         }
         //服务器异常，响应500
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
+    //-------------------------------------------节点 增删改
+
+    /**
+     * 添加一个节点
+     *
+     * @param name
+     * @param parentId
+     * @param isParent
+     * @param sort
+     */
+    @PostMapping
+    public ResponseEntity<Void> categoryAdd(@RequestParam(name = "id", required = false) Long id,
+                                            @RequestParam(name = "name", required = true) String name,
+                                            @RequestParam(name = "parentId", required = true) Long parentId,
+                                            @RequestParam(name = "isParent", required = true) Boolean isParent,
+                                            @RequestParam(name = "sort", required = true) Integer sort) {
+        this.categoryService.categoryAdd(name, parentId, isParent, sort);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> categoryEdit(@RequestParam(name = "id", required = false) Long id,
+                                             @RequestParam(name = "name", required = true) String name) {
+        this.categoryService.categoryEdit(id,name);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> categoryDelete(@RequestParam(name = "id", required = true) Long id){
+        this.categoryService.categoryDelete(id);
+        return ResponseEntity.ok().build();
     }
 }
