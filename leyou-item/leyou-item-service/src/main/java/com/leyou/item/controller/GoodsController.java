@@ -95,4 +95,21 @@ public class GoodsController {
         this.goodsService.deleteGood(spuId);
         return ResponseEntity.ok().build();
     }
+
+    //上下架商品
+    @PutMapping("spu/revert")
+    public ResponseEntity<Void> revertSaleableById(@RequestParam("spuId") Long spuId){
+        try {
+            this.goodsService.revertSaleableById(spuId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
+
+
+
 }

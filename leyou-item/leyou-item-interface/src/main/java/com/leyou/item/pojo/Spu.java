@@ -55,12 +55,12 @@ public class Spu {
     /**
      * 是否上架，0下架，1上架
      */
-    private boolean saleable;
+    private Boolean saleable;
 
     /**
      * 是否有效，0已删除，1有效
      */
-    private boolean valid;
+    private Boolean valid;
 
     /**
      * 添加时间
@@ -133,19 +133,19 @@ public class Spu {
         this.brandId = brandId;
     }
 
-    public boolean getSaleable() {
+    public Boolean getSaleable() {
         return saleable;
     }
 
-    public void setSaleable(boolean saleable) {
+    public void setSaleable(Boolean saleable) {
         this.saleable = saleable;
     }
 
-    public boolean getValid() {
+    public Boolean getValid() {
         return valid;
     }
 
-    public void setValid(boolean valid) {
+    public void setValid(Boolean valid) {
         this.valid = valid;
     }
 

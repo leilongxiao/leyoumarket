@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
@@ -58,13 +59,17 @@ public class GoodsService {
         Example.Criteria criteria = example.createCriteria();
         // 1.搜索条件,类似
         //select * from tb_spu where title likes "%key%" and saleable={#saleable}
-        if (StringUtils.isNotBlank(key) && saleable != null) {
-            criteria.andLike("title", "%" + key + "%").andEqualTo("saleable", saleable);
+
+        if (StringUtils.isNotBlank(key)) {
+            criteria.andLike("title", "%" + key + "%");
         }
 
+        if (saleable != null) {
+            criteria.andEqualTo("saleable", saleable);
+        }
+        //这两个if必须分开，从逻辑上看的
         // 2.分页条件
         PageHelper.startPage(page, rows);//最b
-
         // 3.执行查询
         List<Spu> spus = this.spuMapper.selectByExample(example);
         PageInfo<Spu> pageInfo = new PageInfo<>(spus);//最重要2行a
@@ -215,5 +220,17 @@ public class GoodsService {
         //删除spu表和spuDetail中对应的spuId行
         this.spuDetailMapper.deleteByPrimaryKey(spuId);
         this.spuMapper.deleteByPrimaryKey(spuId);
+    }
+
+    /**
+     * 上/下架转换
+     * @param spuId
+     */
+    public void revertSaleableById(Long spuId) {
+        Spu spu1 = new Spu();
+        Spu spu = this.spuMapper.selectByPrimaryKey(spuId);
+        spu1.setId(spuId);
+        spu1.setSaleable(!spu.getSaleable());
+        this.spuMapper.updateByPrimaryKeySelective(spu1);
     }
 }

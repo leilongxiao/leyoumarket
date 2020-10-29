@@ -1,6 +1,7 @@
 package com.leyou.item.controller;
 
 import com.leyou.common.pojo.PageResult;
+import com.leyou.common.utils.ObjectUtils;
 import com.leyou.item.pojo.Brand;
 import com.leyou.item.service.BrandService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,4 +61,28 @@ public class BrandController {
         return ResponseEntity.ok(brands);
     }
 
+    /**
+     * @param
+     * @return
+     */
+    @GetMapping("bid/{bid}")
+    public ResponseEntity<Brand> brandEditById(@PathVariable("bid") Long id) {
+        //根据id从数据库得到旧对象，并返回给前端。编辑对象（这一步就是之前保存操作）
+        Brand brand = this.brandService.brandEditById(id);
+        if (ObjectUtils.allFieldIsNULL(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("delete")
+    public ResponseEntity<Void> brandDeleteById(@RequestParam("bid") Long bid) {
+        try {
+            this.brandService.deleteBrand(bid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
+    }
 }

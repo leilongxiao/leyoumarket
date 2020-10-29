@@ -81,4 +81,19 @@ public class BrandService {
         return categoryBrandMapper.queryBrandByCategoryID(cid);
     }
 
+    /**
+     * 编辑品牌
+     */
+    public Brand brandEditById(Long id) {
+        Brand brand = this.brandMapper.selectByPrimaryKey(id);
+        return brand;
+    }
+
+    /**
+     * 删除
+     * @param bid
+     */
+    public void deleteBrand(Long bid) {
+        this.brandMapper.deleteByPrimaryKey(bid);
+    }
 }
