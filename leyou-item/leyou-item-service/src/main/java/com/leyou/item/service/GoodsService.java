@@ -233,4 +233,5 @@ public class GoodsService {
         spu1.setSaleable(!spu.getSaleable());
         this.spuMapper.updateByPrimaryKeySelective(spu1);
     }
+
 }

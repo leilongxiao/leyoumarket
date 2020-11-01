@@ -1,3 +1,4 @@
+
 package com.leyou.item.controller;
 
 import com.leyou.common.pojo.PageResult;
@@ -65,7 +66,7 @@ public class GoodsController {
      * @return
      */
     @GetMapping("spu/detail/{spuId}")
-    public ResponseEntity<SpuDetail> editGoodsDetail(@PathVariable("spuId") Long spuId){
+    public ResponseEntity<SpuDetail> querySpuDetailBySpuId(@PathVariable("spuId") Long spuId){
         SpuDetail spuDetail = goodsService.querySpuDetailBySpuId(spuId);
         if (ObjectUtils.allFieldIsNULL(spuDetail)){
             return ResponseEntity.notFound().build();
@@ -74,7 +75,7 @@ public class GoodsController {
     }
 
     @GetMapping("sku/list")
-    public ResponseEntity<List<Sku>> editGoodsSku(@RequestParam("id") Long spuId){
+    public ResponseEntity<List<Sku>> querySkusBySpuId(@RequestParam("id") Long spuId){
         List<Sku> skus = goodsService.querySkusBySpuId(spuId);
         if (CollectionUtils.isEmpty(skus)){
             return ResponseEntity.notFound().build();

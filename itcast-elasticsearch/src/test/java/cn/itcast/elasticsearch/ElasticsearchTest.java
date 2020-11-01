@@ -50,7 +50,7 @@ public class ElasticsearchTest {
      */
     @Test
     public void testDeleteIndex() {
-        elasticsearchTemplate.deleteIndex("heima");
+        elasticsearchTemplate.deleteIndex("goods");
     }
 
     /**

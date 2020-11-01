@@ -85,4 +85,20 @@ public class BrandController {
         }
         return ResponseEntity.ok().build();
     }
+
+    /*----------------------远程调用需要*/
+
+    /**
+     * 根据bid查询brand
+     * @param id
+     * @return
+     */
+    @GetMapping("{id}")
+    public ResponseEntity<Brand> queryBrandById(@PathVariable("id") Long id){
+        Brand brand = this.brandService.queryBrandByCid(id);
+        if (brand==null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(brand);
+    }
 }

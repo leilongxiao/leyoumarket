@@ -71,13 +71,25 @@ public class CategoryController {
     @PutMapping
     public ResponseEntity<Void> categoryEdit(@RequestParam(name = "id", required = false) Long id,
                                              @RequestParam(name = "name", required = true) String name) {
-        this.categoryService.categoryEdit(id,name);
+        this.categoryService.categoryEdit(id, name);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> categoryDelete(@RequestParam(name = "id", required = true) Long id){
+    public ResponseEntity<Void> categoryDelete(@RequestParam(name = "id", required = true) Long id) {
         this.categoryService.categoryDelete(id);
         return ResponseEntity.ok().build();
+    }
+
+    /*-------------------------------补充api接口*/
+    @GetMapping
+    public ResponseEntity<List<String>> queryNamesByIds(@RequestParam("ids") List<Long> ids) {
+        List<String> names = this.categoryService.queryNamesByIds(ids);
+        //为空，响应404
+        if (CollectionUtils.isEmpty(names)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        //正常，响应200
+        return ResponseEntity.ok(names);
     }
 }
