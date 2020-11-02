@@ -3,17 +3,28 @@ package com.leyou.search.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.leyou.common.pojo.PageResult;
 import com.leyou.item.api.SpecificationApi;
 import com.leyou.item.pojo.*;
+import com.leyou.search.GoodsRepository;
 import com.leyou.search.client.BrandClient;
 import com.leyou.search.client.CategoryClient;
 import com.leyou.search.client.GoodsClient;
 import com.leyou.search.client.SpecificationClient;
 import com.leyou.search.pojo.Goods;
+import com.leyou.search.pojo.SearchRequest;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.elasticsearch.index.query.Operator;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +48,9 @@ public class SearchService {
 
     //jackson初始化，中庸fastJson jackson gson
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    @Autowired
+    private GoodsRepository goodsRepository;
 
     public Goods buildGoods(Spu spu) throws IOException {
         Goods goods = new Goods();
@@ -86,13 +100,13 @@ public class SearchService {
                 //判断是否是数值类型
                 if (param.getNumeric()) {
                     //如果是数值类型的参数，返回范围
-                    value = chooseSegment(value,param);
+                    value = chooseSegment(value, param);
                 }
                 specs.put(param.getName(), value);
             } else {
                 //特殊的规格参数
                 List<Object> value = specialSpecMap.get(param.getId());
-                specs.put(param.getName(),value);
+                specs.put(param.getName(), value);
             }
 
         });
@@ -117,16 +131,16 @@ public class SearchService {
             // 获取数值范围
             double begin = NumberUtils.toDouble(segs[0]);
             double end = Double.MAX_VALUE;//这是为了最后有一个-的情况，end为超级大的一个值
-            if(segs.length == 2){
+            if (segs.length == 2) {
                 end = NumberUtils.toDouble(segs[1]);
             }
             // 判断是否在范围内
-            if(val >= begin && val < end){
-                if(segs.length == 1){
+            if (val >= begin && val < end) {
+                if (segs.length == 1) {
                     result = segs[0] + p.getUnit() + "以上";
-                }else if(begin == 0){
+                } else if (begin == 0) {
                     result = segs[1] + p.getUnit() + "以下";
-                }else{
+                } else {
                     result = segment + p.getUnit();
                 }
                 break;
@@ -135,4 +149,31 @@ public class SearchService {
         return result;
     }
 
+
+    /**
+     * 完成基本查询功能
+     *
+     * @param request
+     * @return
+     */
+    public PageResult<Goods> search(SearchRequest request) {
+        //判断查询条件是否为空
+        if (StringUtils.isBlank(request.getKey())) {
+            return null;
+        }
+        ;
+        //自定义构建器
+        NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
+        //添加查询条件,因为添加搜索小米手机的时候不能只出现查询手机的消息，所以应该加上.operator(Operator.AND)
+        queryBuilder.withQuery(QueryBuilders.matchQuery("all", request.getKey()).operator(Operator.AND));
+        //添加分页，行号是从0开始
+        queryBuilder.withPageable(PageRequest.of(request.getPage() - 1, request.getSize()));
+        //添加结果集过滤：id
+        queryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{"id","subTitle","skus"},null));
+        //执行查询获取结果集
+        Page<Goods> goodsPage = this.goodsRepository.search(queryBuilder.build());
+
+        //返回分页结果集
+        return new PageResult<>(goodsPage.getTotalElements(),goodsPage.getTotalPages(),goodsPage.getContent());
+    }
 }
