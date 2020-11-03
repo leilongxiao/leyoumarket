@@ -58,7 +58,7 @@ public class SearchService {
         //根据品牌id查询品牌
         Brand brand = this.brandClient.queryBrandById(spu.getBrandId());
 
-        //根据cid1，cid2，cid3查询对应的一个分类
+        //根据cid1，cid2，cid3查询对应的一个分类，显示成这样子 手机》手机通讯》
         List<String> names = this.categoryClient.queryNamesByIds(Arrays.asList(spu.getCid1(), spu.getCid2(), spu.getCid3()));
 
         //根据spuId查询所有的sku
@@ -67,6 +67,7 @@ public class SearchService {
         List<Long> prices = new ArrayList<>();
         //为了减少索引库压力，只放一部分信息到索引库。一个Map就是一个Sku
         //初始化skuMapList，map中key的取值（id，title,image,price）
+        //skus多->skus少元素
         List<Map<String, Object>> skuMapList = new ArrayList<>();
         skus.forEach(sku -> {
             prices.add(sku.getPrice());
@@ -80,7 +81,7 @@ public class SearchService {
 
         //查询spuDetail，目的 拿到genericSpec SpecialSpec
         SpuDetail spuDetail = this.goodsClient.querySpuDetailBySpuId(spu.getId());
-        //两个反序列化，原来是一个json字符串，变成map
+        //两个反序列化，原来是一个json字符串，变成map，好厉害感觉（jackson中的）
         Map<Long, Object> genericSpecMap = MAPPER.readValue(spuDetail.getGenericSpec(), new TypeReference<Map<Long, Object>>() {
         });
         Map<Long, List<Object>> specialSpecMap = MAPPER.readValue(spuDetail.getSpecialSpec(), new TypeReference<Map<Long, List<Object>>>() {
@@ -88,7 +89,7 @@ public class SearchService {
 
         //查询所有的搜索规格参数
         List<SpecParam> params = this.specificationClient.queryParams(null, spu.getCid3(), null, true);
-        //这里和前面不一样，因为前面的是一个id对应多个sku,这里是spu是一对一的关系，不用List来解决覆盖问题。
+        //这里和前面不一样，因为前面的是一个id对应多个sku,这里和spu是一对一的关系，不用List来解决覆盖问题。
         Map<String, Object> specs = new HashMap<>();
         //注意：：这里有两种规格参数，通用的和特殊的，前者保存在*tb_spu_detail*中的generic_spec，后者保存在 中的special_spec
         //tb_spec_param中有字段来区分两者，需要先判断，tb_sku中有own_spec
@@ -108,9 +109,8 @@ public class SearchService {
                 List<Object> value = specialSpecMap.get(param.getId());
                 specs.put(param.getName(), value);
             }
-
         });
-        //把简单地字段的值赋值goods给对象，id、subTitle、brandId、cid、createTime
+        //把简单地字段的值赋值给goods对象，id、subTitle、brandId、cid、createTime
         BeanUtils.copyProperties(spu, goods);
         goods.setAll(spu.getTitle() + " " + brand.getName() + " " + StringUtils.join(names, " "));
         goods.setPrice(prices);
@@ -161,19 +161,19 @@ public class SearchService {
         if (StringUtils.isBlank(request.getKey())) {
             return null;
         }
-        ;
         //自定义构建器
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();
-        //添加查询条件,因为添加搜索小米手机的时候不能只出现查询手机的消息，所以应该加上.operator(Operator.AND)
+        //添加查询条件,因为添加搜索”小米手机“的时候不能只出现查询手机的消息，所以应该加上.operator(Operator.AND)
+        //goods的all字段是ik分词器分词了的.operator(Operator.AND)是为了选结果的交集，同时满足的
         queryBuilder.withQuery(QueryBuilders.matchQuery("all", request.getKey()).operator(Operator.AND));
         //添加分页，行号是从0开始
         queryBuilder.withPageable(PageRequest.of(request.getPage() - 1, request.getSize()));
-        //添加结果集过滤：id
-        queryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{"id","subTitle","skus"},null));
+        //添加结果集过滤：id（page页面返回给前段的只有这几段有值，其它为null，要前段不显示null、可以在application中配置jackson）
+        queryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{"id", "subTitle", "skus"}, null));
         //执行查询获取结果集
         Page<Goods> goodsPage = this.goodsRepository.search(queryBuilder.build());
 
         //返回分页结果集
-        return new PageResult<>(goodsPage.getTotalElements(),goodsPage.getTotalPages(),goodsPage.getContent());
+        return new PageResult<>(goodsPage.getTotalElements(), goodsPage.getTotalPages(), goodsPage.getContent());
     }
 }

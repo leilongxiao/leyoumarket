@@ -4,8 +4,9 @@ public class SearchRequest {
 
     private String key;// 搜索条件
 
-    private Integer page;// 当前页,这里没有将每页条数弄成一个变量，而是做成一个常量，因为它是一个不可变的。
+    private Integer page;// 当前页码
 
+    // 这里没有将每页条数弄成一个变量，而是做成一个常量，因为它是一个不可变的。
     private static final Integer DEFAULT_SIZE = 20;// 每页大小，不从页面接收，而是固定大小
     private static final Integer DEFAULT_PAGE = 1;// 默认页
 

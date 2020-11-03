@@ -16,7 +16,7 @@ public class Goods {
     private Long id; // spuId
     @Field(type = FieldType.Text, analyzer = "ik_max_word")
     private String all; // 所有需要被搜索的信息，包含标题，分类，甚至品牌
-    @Field(type = FieldType.Keyword, index = false)//不以他创建索引.前，所以不用建.后
+    @Field(type = FieldType.Keyword, index = false)//不以他创建索引.前type，所以不用建.后index
     /*注意String类型必须要加这个注解，因为不能区分是text还是keyword类型的，
     但是Long类型的和Date类型等就不用加，可以推断自动得出*/
     private String subTitle;// 卖点
@@ -28,7 +28,8 @@ public class Goods {
     private List<Long> price;// 价格
     @Field(type = FieldType.Keyword, index = false)
     private String skus;// List<sku>信息的json结构，es中所有东西都只能保存为字符串，比较复杂时候自己转一下，效率会高些
-    private Map<String, Object> specs;// 可搜索的规格参数，key是参数名，值是参数值
+    private Map<String, Object> specs;// 可搜索的规格参数，key是参数名，值是参数值。这个看tb_spec_param表，name对应search，
+    //search对应为1时显示，具体的参数值则在segments里吧
     //这里有个String，specs.key.keyword         specs.key.text都会创建一个，也不加注解
     public Long getId() {
         return id;

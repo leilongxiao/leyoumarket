@@ -10,7 +10,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class SearchController {
@@ -20,6 +19,7 @@ public class SearchController {
 
     @PostMapping("page")
     public ResponseEntity<PageResult<Goods>> search(@RequestBody SearchRequest request){
+        //是要一个json数据所以用了@RequestBody
         PageResult result = this.searchService.search(request);
         if (result == null| CollectionUtils.isEmpty(result.getItems())){
             return ResponseEntity.notFound().build();
