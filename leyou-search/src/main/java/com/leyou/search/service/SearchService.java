@@ -1,10 +1,7 @@
 package com.leyou.search.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.leyou.common.pojo.PageResult;
-import com.leyou.item.api.SpecificationApi;
 import com.leyou.item.pojo.*;
 import com.leyou.search.GoodsRepository;
 import com.leyou.search.client.BrandClient;
@@ -13,23 +10,25 @@ import com.leyou.search.client.GoodsClient;
 import com.leyou.search.client.SpecificationClient;
 import com.leyou.search.pojo.Goods;
 import com.leyou.search.pojo.SearchRequest;
+import com.leyou.search.pojo.SearchResult;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.terms.LongTerms;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.query.FetchSourceFilter;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SearchService {
@@ -156,7 +155,7 @@ public class SearchService {
      * @param request
      * @return
      */
-    public PageResult<Goods> search(SearchRequest request) {
+    public SearchResult search(SearchRequest request) {
         //判断查询条件是否为空
         if (StringUtils.isBlank(request.getKey())) {
             return null;
@@ -170,10 +169,61 @@ public class SearchService {
         queryBuilder.withPageable(PageRequest.of(request.getPage() - 1, request.getSize()));
         //添加结果集过滤：id（page页面返回给前段的只有这几段有值，其它为null，要前段不显示null、可以在application中配置jackson）
         queryBuilder.withSourceFilter(new FetchSourceFilter(new String[]{"id", "subTitle", "skus"}, null));
-        //执行查询获取结果集
-        Page<Goods> goodsPage = this.goodsRepository.search(queryBuilder.build());
 
+        String brandAggName = "brands";
+        String categoryAggname = "categories";
+
+        queryBuilder.addAggregation(AggregationBuilders.terms(brandAggName).field("brandId"));
+        queryBuilder.addAggregation(AggregationBuilders.terms(categoryAggname).field("cid3"));
+        //执行查询获取结果集
+        AggregatedPage<Goods> goodsPage = (AggregatedPage<Goods>) this.goodsRepository.search(queryBuilder.build());
+
+        //解析聚合结果集(有两种结果集需要解析，最好封装成一个方法)
+        List<Brand> brands = getBrandAggResult(goodsPage.getAggregation(brandAggName));
+        List<Map<String, Object>> categories = getCategoryAggResult(goodsPage.getAggregation(categoryAggname));
         //返回分页结果集
-        return new PageResult<>(goodsPage.getTotalElements(), goodsPage.getTotalPages(), goodsPage.getContent());
+        return new SearchResult(goodsPage.getTotalElements(), goodsPage.getTotalPages(), goodsPage.getContent(), categories, brands);
+    }
+
+    /**
+     * 解析品牌的结果集
+     *
+     * @param aggregation
+     * @return
+     */
+    private List<Brand> getBrandAggResult(Aggregation aggregation) {
+        LongTerms terms = (LongTerms) aggregation;
+        // 获取所有的品牌id桶
+        return terms.getBuckets().stream().map(bucket -> {
+            Long id = bucket.getKeyAsNumber().longValue();
+            return this.brandClient.queryBrandById(id);
+
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 解析分类的结果集
+     *
+     * @param aggregation
+     * @return
+     */
+    private List<Map<String, Object>> getCategoryAggResult(Aggregation aggregation) {
+        //强转成LongTerms
+        LongTerms terms = (LongTerms) aggregation;
+        // 获取所有的品牌id桶
+        return terms.getBuckets().stream().map(bucket -> {
+            Map<String, Object> map = new HashMap<>();
+            Long id = bucket.getKeyAsNumber().longValue();
+            List<String> names = this.categoryClient.queryNamesByIds(Arrays.asList(id));
+
+            map.put("id", id);
+            map.put("name", names.get(0));
+            return map;
+        }).collect(Collectors.toList());
+        // 定义一个品牌集合，搜集所有的品牌对象
+
+        // 解析所有的id桶，查询品牌
+
+
     }
 }
