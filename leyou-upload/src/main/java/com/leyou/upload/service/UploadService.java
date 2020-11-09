@@ -1,10 +1,17 @@
 package com.leyou.upload.service;
 
 
+import com.github.tobato.fastdfs.domain.StorePath;
+import com.github.tobato.fastdfs.service.FastFileStorageClient;
+import com.leyou.upload.config.FastClientImporter;
+import net.bytebuddy.asm.Advice;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import tk.mybatis.mapper.util.StringUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -17,7 +24,8 @@ import java.util.List;
 public class UploadService {
     private static final List<String> CONTENT_TYPES = Arrays.asList("image/jpg", "image/jpeg", "image/png");
     public static final Logger LOGGER = LoggerFactory.getLogger(UploadService.class);
-
+    @Autowired
+    public FastFileStorageClient storageClient;
     public String uploadImage(MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         //1.文件类型
@@ -34,11 +42,12 @@ public class UploadService {
                 return null;
             }
 
-            //3.保存到服务器
-            file.transferTo(new File("D:\\IdeaProjects\\code\\leyou\\images\\"+originalFilename));
+            //3.保存到服务器,注意这是文件的地址
+            //file.transferTo(new File("D:\\project\\IdeaProjects\\code\\leyou\\static\\images\\"+originalFilename));
+            String ext = StringUtils.substringAfterLast(originalFilename, ".");
+            StorePath storePath = this.storageClient.uploadFile(file.getInputStream(), file.getSize(), ext, null);
             //4.返回url路径
-
-            return "http://image.leyou.com/"+originalFilename;
+            return "http://image.leyou.com/"+storePath.getFullPath();
         } catch (IOException e) {
             LOGGER.info("文件上传失败：{},服务器异常！{}", originalFilename,e.getMessage());
             e.printStackTrace();
