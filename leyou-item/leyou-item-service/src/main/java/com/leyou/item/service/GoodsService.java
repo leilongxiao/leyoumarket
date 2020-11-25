@@ -4,15 +4,16 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.leyou.common.pojo.PageResult;
 import com.leyou.item.bo.SpuBo;
-import com.leyou.item.mapper.*;
 import com.leyou.item.pojo.*;
+import com.leyou.item.mapper.*;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.amqp.AmqpException;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class GoodsService {
 
     @Autowired
     private StockMapper stockMapper;
+
+    @Autowired
+    private AmqpTemplate amqpTemplate;
 
     /**
      * goods页根据分页查询Spu
@@ -132,6 +136,17 @@ public class GoodsService {
 //        skus.forEach(sku -> sku.setCreateTime(new Date()));
         addSkusAndStock(spuBo);
         //this.skuMapper.insertList(skus);
+
+        //只有增删改需要amqp
+        sendMsg("insert",spuBo.getId());
+    }
+
+    private void sendMsg(String type,Long spuId) {
+        try {
+            this.amqpTemplate.convertAndSend("item."+type, spuId);
+        } catch (AmqpException e) {
+            e.printStackTrace();
+        }
     }
 
     //增加skus-stock的方法，这个方法只是被别的方法调用，本身不直接被controller调用
@@ -194,6 +209,7 @@ public class GoodsService {
         this.spuMapper.updateByPrimaryKeySelective(spuBo);//
         this.spuDetailMapper.updateByPrimaryKeySelective(spuBo.getSpuDetail());
 
+        sendMsg("update",spuBo.getId());
     }
 
     /**
@@ -220,6 +236,8 @@ public class GoodsService {
         //删除spu表和spuDetail中对应的spuId行
         this.spuDetailMapper.deleteByPrimaryKey(spuId);
         this.spuMapper.deleteByPrimaryKey(spuId);
+
+        sendMsg("delete",spuId);
     }
 
     /**
@@ -234,4 +252,8 @@ public class GoodsService {
         this.spuMapper.updateByPrimaryKeySelective(spu1);
     }
 
+
+    public Spu queryspuBySpuId(Long spuId) {
+        return this.spuMapper.selectByPrimaryKey(spuId);
+    }
 }

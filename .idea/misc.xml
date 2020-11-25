@@ -6,6 +6,8 @@
       <list>
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/itcast-elasticsearch/pom.xml" />
+        <option value="$PROJECT_DIR$/msg_demo/alicom-mns-receive-samples/pom.xml" />
+        <option value="$PROJECT_DIR$/../../../../1leyou/day16-用户注册(阿里大于及hibernate-validate)/资料/阿里短信/dysms-demo/pom.xml" />
       </list>
     </option>
   </component>

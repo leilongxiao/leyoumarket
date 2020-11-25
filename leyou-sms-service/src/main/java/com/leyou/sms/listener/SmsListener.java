@@ -3,6 +3,7 @@ package com.leyou.sms.listener;
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.leyou.sms.config.SmsProperties;
 import com.leyou.sms.utils.SmsUtils;
+import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
@@ -25,9 +26,9 @@ public class SmsListener {
     private SmsProperties prop;
 
     @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(value = "leyou.sms.queue", durable = "true"),
-            exchange = @Exchange(value = "leyou.sms.exchange",
-                    ignoreDeclarationExceptions = "true"),
+            value = @Queue(value = "LEYOU.SMS.QUEUE", durable = "true"),
+            exchange = @Exchange(value = "LEYOU.SMS.EXCHANGE",
+                    ignoreDeclarationExceptions = "true",type = ExchangeTypes.TOPIC),
             key = {"sms.verify.code"}))
     public void listenSms(Map<String, String> msg) throws Exception {
         if (msg == null || msg.size() <= 0) {

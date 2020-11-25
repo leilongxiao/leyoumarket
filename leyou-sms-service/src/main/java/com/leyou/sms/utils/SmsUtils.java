@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableConfigurationProperties(SmsProperties.class)
 public class SmsUtils {
+    //阿里提供的demo进行简化和抽取，封装的一个工具类
 
     @Autowired
     private SmsProperties prop;

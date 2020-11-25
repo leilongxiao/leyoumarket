@@ -19,7 +19,7 @@ public class RedisTest {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
-
+    /*这里不直接使用RedisTemplate是因为它会的key1会很占用内存，且可读性不强，用get在linux中或取不到*/
     @Test
     public void testRedis() {
         // 存储数据
@@ -40,7 +40,8 @@ public class RedisTest {
     public void testHash() {
         BoundHashOperations<String, Object, Object> hashOps =
                 this.redisTemplate.boundHashOps("user");
-        // 操作hash数据
+        //相当于把user对象，中的名字和年纪属性换了
+        //boundHashOps是对opsForHash的一个包装 操作hash数据.有的话就获取，没有的话就新增
         hashOps.put("name", "jack");
         hashOps.put("age", "21");
 

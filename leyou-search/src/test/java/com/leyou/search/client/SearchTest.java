@@ -3,7 +3,6 @@ package com.leyou.search.client;
 import com.leyou.LeyouSearchApplication;
 import com.leyou.common.pojo.PageResult;
 import com.leyou.item.bo.SpuBo;
-import com.leyou.item.pojo.Spu;
 import com.leyou.search.GoodsRepository;
 import com.leyou.search.pojo.Goods;
 import com.leyou.search.service.SearchService;
@@ -12,16 +11,11 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.naming.directory.SearchResult;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SpringBootTest(classes = LeyouSearchApplication.class)
 @RunWith(SpringRunner.class)

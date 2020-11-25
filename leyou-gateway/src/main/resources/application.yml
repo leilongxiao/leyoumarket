@@ -14,8 +14,11 @@ zuul:
   #route路由
   routes:
     item-service: /item/** #添加商品微服务的路由、伟服务都要通过网管来进行访问
-    user-service: /user/** #用户微服务
     search-service: /search/** #将它交给网关，这是search服务的controller需要的
+    user-service: /user/** #用户微服务，登录等用的
+    auth-service: /auth/**
+  add-host-header: true
+  sensitive-headers: #覆盖敏感头信息，使cookie可以正常写入
 ribbon:
   connectionTimeout: 50000 #获取连接超时时间
   readTimeout: 50000 #通讯超时时间

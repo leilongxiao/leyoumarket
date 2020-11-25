@@ -6,6 +6,7 @@ import com.leyou.common.utils.ObjectUtils;
 import com.leyou.item.bo.SpuBo;
 import com.leyou.item.pojo.Sku;
 import com.leyou.item.pojo.SpecParam;
+import com.leyou.item.pojo.Spu;
 import com.leyou.item.pojo.SpuDetail;
 import com.leyou.item.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +111,21 @@ public class GoodsController {
     }
 
 
+    //-----------------
 
+    /**
+     * 根据spuId查询Spu
+     * @param spuId
+     * @return
+     */
+    @GetMapping("{spuId}")
+    public ResponseEntity<Spu> querySpuById(@PathVariable("spuId")Long spuId){
+        Spu spu = this.goodsService.queryspuBySpuId(spuId);
+        if (spu == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(spu);
+    }
 
 
 }

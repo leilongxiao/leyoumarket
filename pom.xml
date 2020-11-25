@@ -18,13 +18,23 @@
         <module>leyou-user</module>
         <module>leyou-sms-service</module>
         <module>leyou-search</module>
+        <module>leyou-goods-web</module>
+        <module>leyou-auth</module>
     </modules>
     <dependencies>
         <dependency>
             <groupId>tk.mybatis</groupId>
             <artifactId>mapper-core</artifactId>
             <version>1.0.2</version>
-            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>5.0.11.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
         </dependency>
     </dependencies>
     <packaging>pom</packaging>

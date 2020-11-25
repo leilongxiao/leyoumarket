@@ -3,7 +3,6 @@ import com.leyou.item.pojo.Spu;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;

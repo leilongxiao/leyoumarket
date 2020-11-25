@@ -3,12 +3,12 @@ package com.leyou.search.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.leyou.item.pojo.*;
-import com.leyou.search.GoodsRepository;
-import com.leyou.search.client.BrandClient;
 import com.leyou.search.client.CategoryClient;
 import com.leyou.search.client.GoodsClient;
-import com.leyou.search.client.SpecificationClient;
 import com.leyou.search.pojo.Goods;
+import com.leyou.search.GoodsRepository;
+import com.leyou.search.client.BrandClient;
+import com.leyou.search.client.SpecificationClient;
 import com.leyou.search.pojo.SearchRequest;
 import com.leyou.search.pojo.SearchResult;
 import org.apache.commons.lang.StringUtils;
@@ -225,5 +225,15 @@ public class SearchService {
         // 解析所有的id桶，查询品牌
 
 
+    }
+
+    public void saveIndex(Long spuId) throws IOException {
+        Spu spu = this.goodsClient.querySpuById(spuId);
+        Goods goods = this.buildGoods(spu);
+        this.goodsRepository.save(goods);
+    }
+
+    public void deleteIndex(Long spuId) {
+        this.goodsRepository.deleteById(spuId);
     }
 }
